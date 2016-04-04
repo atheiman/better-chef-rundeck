@@ -43,7 +43,7 @@ First read [filtering Chef search returned attributes](https://docs.chef.io/chef
 
 No, I'm serious. Go read it. It's not even long.
 
-You can specify what attributes in the returned data should point to in the Chef node attributes using GET parameters. *If you dont set these GET parameters, all attributes will be returned (which is probably not what you want).* Specify the attribute name as the GET param and the Chef attribute path as a comma-delimited list as the value of the GET param. So to convert the attribute `['really']['deep']['attr']` into the attribute `short`, use the GET param `short=really,deep,attr`.
+You can specify what attributes in the returned data should point to in the Chef node attributes using GET parameters. **If you dont set these GET parameters, all attributes will be returned (which is probably not what you want).** Specify the attribute name as the GET param and the Chef attribute path as a comma-delimited list as the value of the GET param. So to convert the attribute `['really']['deep']['attr']` into the attribute `short`, use the GET param `short=really,deep,attr`.
 
 ### An Example
 
