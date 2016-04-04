@@ -1,3 +1,4 @@
+require 'uri'
 require 'yaml'
 require 'chef'
 require 'sinatra'
@@ -26,7 +27,7 @@ class BetterChefRundeck < Sinatra::Base
     end
 
     # name cache files <query>.yml
-    cache_file = File.join(settings.cache_dir, q) + '.yml'
+    cache_file = File.join(settings.cache_dir, URI.escape(q + request.query_string)) + '.yml'
 
     # send the cache file if it exists
     send_file cache_file if File.exists? cache_file
@@ -34,12 +35,34 @@ class BetterChefRundeck < Sinatra::Base
     # search results not cached, query the chef server
     Chef::Config.from_file(File.expand_path(settings.chef_config))
 
-    # TODO: build filter_result dynamically based off GET params
-    chef_nodes = Chef::Search::Query.new.search(:node, q, filter_result: {
-      name: ['name'],
-      ip: ['ipaddress'],
-      hostname: ['hostname'],
-    })[0]
+    # set defaults and overrides from GET params
+    cloned = params.clone
+    cloned.delete 'splat'
+    cloned.delete 'captures'
+    defaults, overrides = {}, {}
+    filter_result = {
+      name: ['name']
+    }
+    cloned.each do |k, v|
+      # default attributes
+      if k.start_with? 'default_'
+        defaults[k.sub(/^default_/, '')] = v
+      # override attributes
+      elsif k.start_with? 'override_'
+        overrides[k.sub(/^override_/, '')] = v
+      # filter_result
+      else
+        filter_result[k] = v.split(',')
+      end
+    end
+
+    puts "defaults: #{defaults}"
+    puts "overrides: #{overrides}"
+    puts "filter_result: #{filter_result}"
+
+    chef_nodes = Chef::Search::Query.new.search(:node, q, filter_result: filter_result)[0]
+
+    # TODO: add defaults and overrides to each chef node
 
     formatted_nodes = {}
     chef_nodes.each do |n|
