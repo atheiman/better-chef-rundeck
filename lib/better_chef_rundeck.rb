@@ -41,7 +41,14 @@ class BetterChefRundeck < Sinatra::Base
     cloned.delete 'captures'
     defaults, overrides = {}, {}
     filter_result = {
-      name: ['name']
+      name:        ['name'],
+      environment: ['chef_environment'],
+      fqdn:        ['fqdn'],
+      ip:          ['ipaddress'],
+      run_list:    ['run_list'],
+      roles:       ['roles'],
+      platform:    ['platform'],
+      tags:        ['tags'],
     }
     cloned.each do |k, v|
       # default attributes
