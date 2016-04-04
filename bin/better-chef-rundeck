@@ -1,0 +1,99 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require_relative '../lib/better_chef_rundeck'
+
+options = {
+  bind: 'localhost',
+  port: 4567,
+  cache_dir: File.join('/', 'tmp', File.basename($0) + '-cache'),
+  cache_time: 30,
+}
+
+# default the chef config file to the first file that exists
+default_chef_configs = ['~/.chef/knife.rb', '/etc/chef/client.rb'].map! {|f| File.expand_path(f)}
+default_chef_configs.each do |c|
+  if File.exists?(c)
+    options[:chef_config] = c
+    break
+  end
+end
+
+# option parsing
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
+
+  opts.on('-c', '--chef-config CONFIG',
+          "Chef config file (default is first in: #{default_chef_configs.join(', ')})") do |c|
+    options[:chef_config] = c
+  end
+
+  opts.on('-s', '--chef-server-url URL', 'Chef server URL') do |s|
+    options[:chef_server_url] = s
+  end
+
+  opts.on('-n', '--chef-client-name NAME', 'Chef API client name') do |n|
+    options[:chef_client_name] = n
+  end
+
+  opts.on('-k', '--chef-client-key KEY', 'Chef API client key') do |k|
+    options[:chef_client_key] = k
+  end
+
+  opts.on('-p', '--port', "set the port (default: #{options[:port]})") do |p|
+    options[:port] = p.to_i
+  end
+
+  opts.on('-b', '--bind-address', "set the host (default: #{options[:bind]})") do |o|
+    options[:bind] = o
+  end
+
+  opts.on('-e', '--environment ENVIRONMENT',
+          'set the environment (default: ENV[\'RACK_ENV\'] if set or development)') do |e|
+    options[:environment] = e.to_sym
+  end
+
+  opts.on('-C', '--cache-dir ENVIRONMENT',
+          "directory to store cached chef search results (default: #{options[:cache_dir]})") do |c|
+    options[:cache_dir] = c
+  end
+
+  opts.on('-t', '--cache-time SECONDS',
+          "length of time in seconds to cache chef search results for (default: #{options[:cache_time]})") do |s|
+    options[:cache_time] = s.to_i
+  end
+
+  opts.on('-h', '--help', 'Displays help') do
+    puts opts
+    exit
+  end
+
+end.parse!
+
+
+# if one chef config cli arg defined then all must be defined
+msg = "Found at least one of chef-server-url, chef-client-name, chef-client-key, but not all."
+cli_chef_config = [options[:chef_server_url], options[:chef_client_name], options[:chef_client_key]]
+if cli_chef_config.any? && cli_chef_config.any(&:nil?)
+  raise OptionParser::MissingArgument, msg
+end
+
+# ensure chef api client can be initialized
+msg = <<-EOM
+Do one of the following:
+  Create chef config file at #{default_chef_configs.join(', or ')}
+  Set chef-config option
+  Set chef-server-url, chef-client-name, and chef-client-key options
+EOM
+if ([options[:chef_config]] + cli_chef_config).all?(&:nil?)
+  raise OptionParser::MissingArgument, msg
+end
+
+puts "Starting #{$0} with options: #{options}"
+
+# apply options to sinatra app settings
+options.each do |k,v|
+  BetterChefRundeck.set k, v
+end
+
+BetterChefRundeck.run!

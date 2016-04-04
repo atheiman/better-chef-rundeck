@@ -1,7 +1,7 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "sinatra"
-gem "chef"
+gem 'chef'
+gem 'sinatra'
 
 group :development do
   gem 'sinatra-contrib'
