@@ -37,6 +37,7 @@ class BetterChefRundeck < Sinatra::Base
     send_file cache_file if File.exists? cache_file
 
     # search results not cached, query the chef server
+    # TODO: generate chef config from cli options if provided
     Chef::Config.from_file(File.expand_path(settings.chef_config))
 
     # set defaults and overrides from GET params
