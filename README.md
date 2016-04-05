@@ -34,8 +34,10 @@ Try out the app at [localhost:4567/key:search_pattern](http://localhost:4567/key
 You can set logging and other stuff with command line options. Learn more about these with the `-h`, `--help` option:
 
 ```
-bundle exec bin/better-chef-rundeck
+bundle exec bin/better-chef-rundeck --help
 ```
+
+## Caching
 
 If the same Chef search is called within the specified cache seconds setting, the cached result will be returned.
 
