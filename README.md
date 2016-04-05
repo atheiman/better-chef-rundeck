@@ -27,7 +27,7 @@ bundle exec bin/better-chef-rundeck
 
 The app will look for a `knife.rb` or / then `client.rb` to configure its Chef server api calls by default.
 
-Try out the app at [localhost:4567/key:search_pattern]
+Try out the app at [localhost:4567/key:search_pattern](http://localhost:4567/key:search_pattern)
 
 # Gem Configuration
 
