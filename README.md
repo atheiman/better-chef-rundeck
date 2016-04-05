@@ -69,7 +69,7 @@ somenode:
 Request:
 
 ```yaml
-GET /name:somenode?ip:ipaddress&kernel_version:kernel,version&ruby_version:languages,ruby,version
+# GET /name:somenode?ip:ipaddress&kernel_version:kernel,version&ruby_version:languages,ruby,version
 
 ---
 somenode:
@@ -101,7 +101,7 @@ anothernode:
 A request without specifying `filter_result` GET params would return exactly the data above. But a request specifying only the `filter_result` GET params `ip=ipaddress` and `ruby_version=languages,ruby,version` will not get all the attributes back because the request did not specify them:
 
 ```yaml
-GET /name:anothernode?ip:ipaddress&ruby_version:languages,ruby,version
+# GET /name:anothernode?ip:ipaddress&ruby_version:languages,ruby,version
 
 ---
 anothernode:
@@ -134,7 +134,7 @@ nodec:
 This request would return something similar to the following:
 
 ```yaml
-GET /*:*?default_domain=github.com&override_ruby_version=2.2.0&default_username=${option.username}
+# GET /*:*?default_domain=github.com&override_ruby_version=2.2.0&default_username=${option.username}
 
 ---
 nodea:
