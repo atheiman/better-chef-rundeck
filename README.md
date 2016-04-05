@@ -37,7 +37,7 @@ You can set logging and other stuff with command line options. Learn more about 
 bundle exec bin/better-chef-rundeck
 ```
 
-Caching is enabled by default - if the same Chef search is called within 30 seconds, the cached result will be returned.
+If the same Chef search is called within the specified cache seconds setting, the cached result will be returned.
 
 # Usage in Rundeck
 

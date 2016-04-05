@@ -11,14 +11,13 @@ class BetterChefRundeck < Sinatra::Base
 
   configure :production, :development do
     enable :logging
+    # TODO: configure logging based on settings.log_file
+    #   but the settings object is not available in a configure block...
+    #   probably need to move configure block to bin/better-chef-rundeck
   end
 
   get '/' do
     "#{File.basename($0)} is up and running"
-  end
-
-  get '/favicon.ico' do
-    status 404
   end
 
   get /\/(.+:.+)/ do |q|
