@@ -43,7 +43,7 @@ Read [filtering Chef search returned attributes](https://docs.chef.io/chef_searc
 
 No, I'm serious. Go read it. It's not even long.
 
-Specify what attributes in the returned data should point to in the Chef node attributes using GET parameters. **If these GET parameters are not set, all Chef attributes will be returned (which is probably not what is wanted).** Specify the attribute name as the GET param and the Chef attribute path as a comma-delimited list as the value of the GET param. So to convert the attribute `['really']['deep']['attr']` into the attribute `short`, use the GET param `short=really,deep,attr`.
+Specify what attributes in the returned data should point to in the Chef node attributes using GET parameters. **If these GET parameters are not set, all Chef attributes will be returned (which is probably not what is wanted).** Specify the attribute name as the GET param and the Chef attribute path as a comma-delimited list (examples: `some,attribute,path`, `languages,ruby,version`) as the value of the GET param. So to convert the attribute `['really']['deep']['attr']` into the attribute `short`, use the GET param `short=really,deep,attr`.
 
 ### An Example
 
@@ -72,7 +72,7 @@ nodea:
 
 ## `default_`ing and `override_`ing Attributes
 
-Set GET parameters to default and override node attributes. Set the GET parameter `default_<attr>=<value>` to default `<attr>` to `<value>`. Similarly, set the GET parameter `override_<attr>=<value>` to set `<attr>` to `<value>` for *all* nodes returned. To illustrate this, three Chef nodes with different attributes (some attributes unset):
+Set GET parameters to default and override node attributes. Set the GET parameter `default_<attr>=<value>` to default `<attr>` to `<value>` (defaults if the attribute value is `nil` or the attribute is not set for the node). Similarly, set the GET parameter `override_<attr>=<value>` to set `<attr>` to `<value>` for *all* nodes returned. To illustrate this, three Chef nodes with different attributes (some attributes unset):
 
 ```yaml
 nodea:

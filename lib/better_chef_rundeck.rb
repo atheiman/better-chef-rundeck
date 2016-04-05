@@ -73,7 +73,7 @@ class BetterChefRundeck < Sinatra::Base
     else
       # if some GET params were given for filter_result, use them instead
       params_clone.each do |k, v|
-        # TODO: warn "attribute #{k} defaulted to nil" if v.nil?
+        logger.warn "attribute #{k} defaulted to nil" if v.nil?
         filter_result[k] = v.split(',')
       end
     end

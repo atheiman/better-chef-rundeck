@@ -8,6 +8,7 @@ options = {
   port: 4567,
   cache_dir: File.join('/', 'tmp', File.basename($0) + '-cache'),
   cache_time: 10,
+  log_file: File.join('/', 'tmp', File.basename($0) + '-log')
 }
 
 # default the chef config file to the first file that exists
@@ -40,11 +41,11 @@ OptionParser.new do |opts|
     options[:chef_client_key] = k
   end
 
-  opts.on('-p', '--port', "set the port (default: #{options[:port]})") do |p|
+  opts.on('-p', '--port PORT', "set the port (default: #{options[:port]})") do |p|
     options[:port] = p.to_i
   end
 
-  opts.on('-b', '--bind-address', "set the host (default: #{options[:bind]})") do |o|
+  opts.on('-b', '--bind-address ADDRESS', "set the host (default: #{options[:bind]})") do |o|
     options[:bind] = o
   end
 
@@ -55,12 +56,19 @@ OptionParser.new do |opts|
 
   opts.on('-C', '--cache-dir ENVIRONMENT',
           "directory to store cached chef search results (default: #{options[:cache_dir]})") do |c|
-    options[:cache_dir] = c
+    options[:cache_dir] = File.expand_path(c)
   end
 
   opts.on('-t', '--cache-time SECONDS',
-          "length of time in seconds to cache chef search results for (default: #{options[:cache_time]})") do |s|
+          "length of time in seconds to cache chef search results for (default: \
+           #{options[:cache_time]})") do |s|
     options[:cache_time] = s.to_i
+  end
+
+  opts.on('-l', '--log-file FILE',
+          "file to log to - only used in production environment (default: \
+          #{options[:log_file]})") do |l|
+    options[:log_file] = File.expand_path(l)
   end
 
   opts.on('-h', '--help', 'Displays help') do
