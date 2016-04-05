@@ -9,8 +9,12 @@ class BetterChefRundeck < Sinatra::Base
     register Sinatra::Reloader
   end
 
+  configure :production, :development do
+    enable :logging
+  end
+
   get '/' do
-    "#{File.basename($0)} is up and running\ncache_dir: #{settings.cache_dir}"
+    "#{File.basename($0)} is up and running"
   end
 
   get '/favicon.ico' do
@@ -36,48 +40,68 @@ class BetterChefRundeck < Sinatra::Base
     Chef::Config.from_file(File.expand_path(settings.chef_config))
 
     # set defaults and overrides from GET params
-    cloned = params.clone
-    cloned.delete 'splat'
-    cloned.delete 'captures'
+    params_clone = params.clone
+    params_clone.delete 'splat'
+    params_clone.delete 'captures'
     defaults, overrides = {}, {}
-    filter_result = {
-      name:        ['name'],
-      environment: ['chef_environment'],
-      fqdn:        ['fqdn'],
-      ip:          ['ipaddress'],
-      run_list:    ['run_list'],
-      roles:       ['roles'],
-      platform:    ['platform'],
-      tags:        ['tags'],
-    }
-    cloned.each do |k, v|
-      # default attributes
-      if k.start_with? 'default_'
+
+    params_clone.each do |k, v|
+      if k.match(/^default_.+/)
         defaults[k.sub(/^default_/, '')] = v
-      # override attributes
-      elsif k.start_with? 'override_'
+        params_clone.delete k
+      elsif k.match(/^override_.+/)
         overrides[k.sub(/^override_/, '')] = v
-      # filter_result
-      else
+        params_clone.delete k
+      end
+    end
+
+    # always default name to name, it can still be overriden by specifying ?name=some,attr,path
+    filter_result = {name: ['name']}
+    # the only keys left in params_clone are for filter_result
+    if params_clone.empty?
+      # if no GET params were given for filter_result to be generated, use the default
+      default_filter_result = {
+        environment: ['chef_environment'],
+        fqdn:        ['fqdn'],
+        ip:          ['ipaddress'],
+        run_list:    ['run_list'],
+        roles:       ['roles'],
+        platform:    ['platform'],
+        tags:        ['tags'],
+      }
+      filter_result = filter_result.merge default_filter_result
+    else
+      # if some GET params were given for filter_result, use them instead
+      params_clone.each do |k, v|
+        # TODO: warn "attribute #{k} defaulted to nil" if v.nil?
         filter_result[k] = v.split(',')
       end
     end
 
-    puts "defaults: #{defaults}"
-    puts "overrides: #{overrides}"
-    puts "filter_result: #{filter_result}"
-
+    # query the chef server
     chef_nodes = Chef::Search::Query.new.search(:node, q, filter_result: filter_result)[0]
 
-    # TODO: add defaults and overrides to each chef node
-
+    # format nodes for yaml: {<name>: {<attr>: <value>, <attr>: <value>}}
     formatted_nodes = {}
-    chef_nodes.each do |n|
-      formatted_nodes[n.delete('name')] = n
+    chef_nodes.each do |node|
+      # 400 error if name attribute is nil
+      if node['name'].nil?
+        halt 400, "Error: node(s) missing name attribute. You've overriden the `name` \
+attribute to the attribute path `#{params['name']}` in your GET parameters \
+`#{request.query_string}`"
+      end
+
+      # merge in default attributes (overwrite nil node attributes)
+      node.merge!(defaults) { |key, node_val, default_val| default_val if node_val.nil? }
+      # merge in override attributes (overwrite all node attributes)
+      node.merge! overrides
+      formatted_nodes[node.delete('name')] = node
     end
+
+    # create the cache file
     File.write(cache_file, formatted_nodes.to_yaml)
+
+    # send the cache file
     send_file cache_file
   end
 end
-
-# get /run_list:base_os?ipaddress=ipaddress&default_ssh-authentication=true&override_username=${option.username}

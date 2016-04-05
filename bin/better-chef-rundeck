@@ -7,7 +7,7 @@ options = {
   bind: 'localhost',
   port: 4567,
   cache_dir: File.join('/', 'tmp', File.basename($0) + '-cache'),
-  cache_time: 30,
+  cache_time: 10,
 }
 
 # default the chef config file to the first file that exists
