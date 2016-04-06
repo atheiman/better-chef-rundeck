@@ -2,7 +2,4 @@ source 'https://rubygems.org'
 
 gem 'chef'
 gem 'sinatra'
-
-group :development do
-  gem 'sinatra-contrib'
-end
+gem "passenger", ">= 5.0.25", require: "phusion_passenger/rack_handler"

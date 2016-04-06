@@ -4,20 +4,15 @@ require 'chef'
 require 'sinatra'
 
 class BetterChefRundeck < Sinatra::Base
-  configure :development do
-    require 'sinatra/reloader'
-    register Sinatra::Reloader
+  class Error < StandardError
   end
 
-  configure :production, :development do
-    enable :logging
-    # TODO: configure logging based on settings.log_file
-    #   but the settings object is not available in a configure block...
-    #   probably need to move configure block to bin/better-chef-rundeck
-  end
+  app_name = 'better-chef-rundeck'
+  env_var_prefix = 'BCR_'
 
   get '/' do
-    "#{File.basename($0)} is up and running"
+    "better-chef-rundeck is up and running"
+    p "settings.cache_dir: #{settings.cache_dir}"
   end
 
   get /\/(.+:.+)/ do |q|
@@ -73,7 +68,8 @@ class BetterChefRundeck < Sinatra::Base
     else
       # if some GET params were given for filter_result, use them instead
       params_clone.each do |k, v|
-        logger.warn "attribute #{k} defaulted to nil" if v.nil?
+        # TODO: logging
+        # logger.warn "attribute #{k} defaulted to nil" if v.nil?
         filter_result[k] = v.split(',')
       end
     end
@@ -94,7 +90,7 @@ attribute to the attribute path `#{params['name']}` in your GET parameters \
       # merge in default attributes (overwrite nil node attributes)
       node.merge!(defaults) { |key, node_val, default_val| default_val if node_val.nil? }
       # merge in override attributes (overwrite all node attributes)
-      node.merge! overrides
+      node.merge!(overrides)
       formatted_nodes[node.delete('name')] = node
     end
 
