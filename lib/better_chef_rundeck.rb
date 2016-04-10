@@ -7,12 +7,27 @@ class BetterChefRundeck < Sinatra::Base
   class Error < StandardError
   end
 
-  app_name = 'better-chef-rundeck'
-  env_var_prefix = 'BCR_'
+  def self.app_name
+    'better-chef-rundeck'
+  end
+  def self.env_var_prefix
+    'BCR_'
+  end
+  def self.to_env_var key
+    self.env_var_prefix + key.to_s.upcase
+  end
 
   get '/' do
-    "better-chef-rundeck is up and running"
-    p "settings.cache_dir: #{settings.cache_dir}"
+    content_type 'text/plain'
+    content = <<-EOS.gsub /^\s+/, ""
+    better-chef-rundeck is up and running!
+    cache_dir: #{settings.cache_dir}
+    cache_time: #{settings.cache_time}
+    chef_config: #{settings.chef_config}
+    chef_server_url: #{settings.chef_server_url}
+    chef_client_name: #{settings.chef_client_name}
+    chef_client_key: #{settings.chef_client_key}
+    EOS
   end
 
   get /\/(.+:.+)/ do |q|
@@ -20,8 +35,8 @@ class BetterChefRundeck < Sinatra::Base
     Dir.mkdir(settings.cache_dir) unless File.directory?(settings.cache_dir)
 
     # delete old cache files
-    Dir.glob(File.join(settings.cache_dir, '*')).each do |f|
-      File.delete f if (Time.now - File.mtime(f)) > settings.cache_time
+    Dir.glob(File.join(File.expand_path(settings.cache_dir), '*')).each do |f|
+      File.delete f if (Time.now - File.mtime(f)) > settings.cache_time.to_f
     end
 
     # name cache files <query>.yml

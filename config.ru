@@ -1,11 +1,15 @@
 require File.absolute_path('lib/better_chef_rundeck')
 
-# default settings
-defaults = {
-  cache_dir:  File.join('/', 'tmp', BetterChefRundeck.app_name + '-cache'),
-  cache_time: 10,
+# alias the sinatra app class
+App = BetterChefRundeck
 
-  # not yet implemented
+# default settings for the app
+defaults = {
+  cache_dir:  File.join('/', 'tmp', App.app_name + '-cache'),
+  cache_time: 10,
+  chef_config: nil,
+
+  # TODO: not yet implemented
   chef_server_url: nil,
   chef_client_name: nil,
   chef_client_key: nil,
@@ -19,49 +23,50 @@ default_chef_configs.each do |c|
   end
 end
 
-# map defaults keys to environment variables
-def to_env_var key
-  BetterChefRundeck.env_var_prefix + key.to_s.upcase
-end
-
-BetterChefRundeck.configure do
+# configure the app settings from defaults hash (defaults and env vars)
+App.configure do
   # environment variables override default values
   # APP_SOME_SETTING env var overrides :some_setting default
-  defaults.each { |k, v| App.set k, ENV[to_env_var k] || v }
+  defaults.each { |k, v| App.set k, ENV[App.to_env_var k] || v }
+  # remember, all settings are stored as strings here. reference cache time with
+  # settings.cache_time.to_f
 end
 
-# BetterChefRundeck.configure :production, :development do
+# App.configure :production, :development do
 #   # TODO: logging
 #   enable :logging
 # end
 
+# ensure the necessary config / env vars exist to run the app
+chef_vars = [:chef_server_url, :chef_client_name, :chef_client_key].map {|e| App.to_env_var e}
+chef_settings = [App.settings.chef_server_url, App.settings.chef_client_name,
+                 App.settings.chef_client_key]
+chef_config_env_var = App.to_env_var :chef_config
 # TODO: generate chef config from server url, client name, and client key configs
-msg <<-EOM
-#{to_env_var chef_server_url}, #{to_env_var chef_client_name}, and #{to_env_var chef_client_key} are
-not yet implemented. Chef config can only be generated from #{default_chef_configs.join(', or ')}
-right now.
+if chef_settings.any?
+  raise NotImplementedError, <<-EOM
+#{chef_vars.join(', ')} are not yet implemented. Chef config currently can only be generated from
+#{default_chef_configs.join(', or ')}.
 EOM
-if [settings.chef_server_url, settings.chef_client_name, settings.chef_client_key].any?
-  raise NotImplementedError, msg
 end
 
 # if chef_server_url, chef_client_name, or chef_client_key defined, all must be defined
-msg <<-EOM
+if chef_settings.any? && !chef_settings.all?
+  raise App::Error, <<-EOM
 At least one of the following environment variables was set, but not all:
-  #{to_env_var chef_server_url}, #{to_env_var chef_client_name}, #{to_env_var chef_client_key}
-Either set all of these env vars, or set none of them and use #{to_env_var chef_config}.
+  #{chef_vars.join(', ')}
+Either set all of these env vars, or none of them and set #{chef_config_env_var} instead.
 EOM
-unless [settings.chef_server_url, settings.chef_client_name, settings.chef_client_key].all?
-  raise BetterChefRundeck::Error, msg
 end
 
 # ensure chef api client can be initialized
-msg = <<-EOM
+unless File.exists?(File.expand_path(App.settings.chef_config)) || chef_settings.all?
+  raise App::Error, <<-EOM
 Cannot create query Chef server without necessary config. Do one of the following:
-  Create chef config file at #{default_chef_configs.join(', or ')}
-  Set chef-config option
-  Set chef-server-url, chef-client-name, and chef-client-key options
+  - Create a chef config file at #{(default_chef_configs).join(', or ')}
+  - Set env var #{chef_config_env_var} pointing to a knife.rb or client.rb
+  - Set env vars #{chef_vars.join(', ')}
 EOM
-raise BetterChefRundeck::Error, msg unless ([options[:chef_config]] + cli_chef_config).any?
+end
 
-run BetterChefRundeck
+run App
