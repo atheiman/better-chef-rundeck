@@ -1,10 +1,13 @@
 require 'uri'
 require 'yaml'
-require 'chef'
-require 'sinatra'
 
 class BetterChefRundeck < Sinatra::Base
   class Error < StandardError
+  end
+
+  if development?
+    require 'sinatra/reloader'
+    register Sinatra::Reloader
   end
 
   def self.app_name
@@ -20,7 +23,7 @@ class BetterChefRundeck < Sinatra::Base
   get '/' do
     content_type 'text/plain'
     content = <<-EOS.gsub /^\s+/, ""
-    better-chef-rundeck is up and running!
+    #{BetterChefRundeck.app_name} is up and running!
     cache_dir: #{settings.cache_dir}
     cache_time: #{settings.cache_time}
     chef_config: #{settings.chef_config}

@@ -1,10 +1,10 @@
 # Better Chef Rundeck
 
-A Sinatra app for integrating Rundeck and Chef - a Chef search query is sent to the app at `/<key>:<search_term>` and the app will query the Chef server and return the nodes and their attributes in a format suitable for a Rundeck project's [resource model source](http://rundeck.org/docs/administration/managing-node-sources.html#resource-model-source).
+A Sinatra app for integrating Rundeck and Chef - a Chef search query is sent as an HTTP GET request to the app at the path `/<key>:<search_term>` and the app will query the Chef server and return the nodes and their attributes in a format suitable for a Rundeck project's [resource model source](http://rundeck.org/docs/administration/managing-node-sources.html#resource-model-source).
 
 # Overview
 
-This Sinatra app allows defining a Chef node search query right in the path of an HTTP request. For example:
+This app allows defining a Chef node search query right in the path of an HTTP request. For example:
 
 ```
 GET /role:webserver
@@ -19,29 +19,51 @@ resources.source.1.config.url=http\://better-chef-rundeck.example.com/role:webse
 
 # Running the App
 
-This gem is not yet production ready or available from rubygems. Until then, clone the project, and install dependencies with `bundle install`. Then run the app:
+## Local Development
+
+This gem is not yet production ready or available from rubygems. Until then, clone the project, and install dependencies with `bundle install`. Then run the app for local devlopment:
 
 ```
-bundle exec bin/better-chef-rundeck
+bundle exec rackup
 ```
 
 The app will look for a `knife.rb` or / then `client.rb` to configure its Chef server api calls by default.
 
-Try out the app at [localhost:4567/key:search_pattern](http://localhost:4567/key:search_pattern)
+Try out the app at http://localhost:9292/
 
-# Gem Configuration
+Optionally, configure a few things specific to the app using environment variables - these are defined a bit further down. You can also specify web server-type config options with `rackup` arguments, run `bundle exec rackup --help` to learn more about these.
 
-You can set logging and other stuff with command line options. Learn more about these with the `-h`, `--help` option:
+The app can also be run locally with Passenger standalone like it would be run in production:
 
 ```
-bundle exec bin/better-chef-rundeck --help
+bundle exec passenger start
 ```
+
+## In Production
+
+This app can easily be run with [Passenger standalone](https://www.phusionpassenger.com/library/config/standalone/intro.html). Passenger's standalone server is reliable enough to run an internal only app that handles a small amount of traffic. The basic steps are:
+
+1. Clone the app from [the GitHub repo](https://github.com/atheiman/better-chef-rundeck)
+1. Install dependencies with `bundle install --deployment --without development test`
+1. Run the app: `bundle exec passenger start --environment production`
+
+Additionally, configure the app with a `Passengerfile.json` or `passenger`'s command line arguments. [Here is a reference for those config options](https://www.phusionpassenger.com/library/config/standalone/reference/). In addition to common web server-type config options, there are config options specific to this app that can be configured with environment variables. These can be set in the shell of the user running the app with `export ENVVAR=VALUE`, or with [passenger command line args or `Passengerfile.json`](https://www.phusionpassenger.com/library/config/standalone/reference/#--envvar-envvars). These options are described below:
+
+## Configuration
+
+The app is configured with shell environment variables. These env vars are namespaced to not be overwritten by other programs. It should be clear that the app will run fine with the default configuration, and setting any of these env vars is not required.
+
+Environment Variable | Explanation | Default Value
+-------------------- | ----------- | -------------
+`BCR_CACHE_DIR` | Chef search results are stored in this directory for cached responses | `/tmp/better-chef-rundeck-cache`
+`BCR_CACHE_TIME` | Cached responses are stored for this many seconds | `30`
+`BCR_CHEF_CONFIG` | Path to a Chef config file | First that exists in `['~/.chef/knife.rb', '/etc/chef/client.rb']`
 
 ## Caching
 
 If the same Chef search is called within the specified cache seconds setting, the cached result will be returned.
 
-# Usage in Rundeck
+# Using the API
 
 ## Which Attributes to Return from Chef
 

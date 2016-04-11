@@ -1,3 +1,8 @@
+require 'rubygems'
+require 'bundler'
+
+Bundler.require
+
 require File.absolute_path('lib/better_chef_rundeck')
 
 # alias the sinatra app class
@@ -6,7 +11,7 @@ App = BetterChefRundeck
 # default settings for the app
 defaults = {
   cache_dir:  File.join('/', 'tmp', App.app_name + '-cache'),
-  cache_time: 10,
+  cache_time: 30,
   chef_config: nil,
 
   # TODO: not yet implemented
@@ -28,8 +33,7 @@ App.configure do
   # environment variables override default values
   # APP_SOME_SETTING env var overrides :some_setting default
   defaults.each { |k, v| App.set k, ENV[App.to_env_var k] || v }
-  # remember, all settings are stored as strings here. reference cache time with
-  # settings.cache_time.to_f
+  # settings are stored as strings. reference cache time with settings.cache_time.to_f
 end
 
 # App.configure :production, :development do
