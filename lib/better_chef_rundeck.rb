@@ -43,7 +43,8 @@ class BetterChefRundeck < Sinatra::Base
     end
 
     # name cache files <query>.yml
-    cache_file = File.join(settings.cache_dir, URI.escape(q + request.query_string)) + '.yml'
+    cache_file = File.join(settings.cache_dir,
+                           URI.escape(q + request.query_string).gsub(/\//, '__SLASH__')) + '.yml'
 
     # send the cache file if it exists
     send_file cache_file if File.exists? cache_file
