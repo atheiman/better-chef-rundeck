@@ -1,23 +1,36 @@
 require 'uri'
 require 'yaml'
-require 'chef'
-require 'sinatra'
 
 class BetterChefRundeck < Sinatra::Base
-  configure :development do
+  class Error < StandardError
+  end
+
+  if development?
     require 'sinatra/reloader'
     register Sinatra::Reloader
   end
 
-  configure :production, :development do
-    enable :logging
-    # TODO: configure logging based on settings.log_file
-    #   but the settings object is not available in a configure block...
-    #   probably need to move configure block to bin/better-chef-rundeck
+  def self.app_name
+    'better-chef-rundeck'
+  end
+  def self.env_var_prefix
+    'BCR_'
+  end
+  def self.to_env_var key
+    self.env_var_prefix + key.to_s.upcase
   end
 
   get '/' do
-    "#{File.basename($0)} is up and running"
+    content_type 'text/plain'
+    content = <<-EOS.gsub /^\s+/, ""
+    #{BetterChefRundeck.app_name} is up and running!
+    cache_dir: #{settings.cache_dir}
+    cache_time: #{settings.cache_time}
+    chef_config: #{settings.chef_config}
+    chef_server_url: #{settings.chef_server_url}
+    chef_client_name: #{settings.chef_client_name}
+    chef_client_key: #{settings.chef_client_key}
+    EOS
   end
 
   get /\/(.+:.+)/ do |q|
@@ -25,8 +38,8 @@ class BetterChefRundeck < Sinatra::Base
     Dir.mkdir(settings.cache_dir) unless File.directory?(settings.cache_dir)
 
     # delete old cache files
-    Dir.glob(File.join(settings.cache_dir, '*')).each do |f|
-      File.delete f if (Time.now - File.mtime(f)) > settings.cache_time
+    Dir.glob(File.join(File.expand_path(settings.cache_dir), '*')).each do |f|
+      File.delete f if (Time.now - File.mtime(f)) > settings.cache_time.to_f
     end
 
     # name cache files <query>.yml
@@ -73,7 +86,8 @@ class BetterChefRundeck < Sinatra::Base
     else
       # if some GET params were given for filter_result, use them instead
       params_clone.each do |k, v|
-        logger.warn "attribute #{k} defaulted to nil" if v.nil?
+        # TODO: logging
+        # logger.warn "attribute #{k} defaulted to nil" if v.nil?
         filter_result[k] = v.split(',')
       end
     end
@@ -94,7 +108,7 @@ attribute to the attribute path `#{params['name']}` in your GET parameters \
       # merge in default attributes (overwrite nil node attributes)
       node.merge!(defaults) { |key, node_val, default_val| default_val if node_val.nil? }
       # merge in override attributes (overwrite all node attributes)
-      node.merge! overrides
+      node.merge!(overrides)
       formatted_nodes[node.delete('name')] = node
     end
 

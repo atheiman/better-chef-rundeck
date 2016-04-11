@@ -76,6 +76,9 @@ GEM
       plist (~> 3.1)
       systemu (~> 2.6.4)
       wmi-lite (~> 1.0)
+    passenger (5.0.26)
+      rack
+      rake (>= 0.8.1)
     plist (3.1.0)
     proxifier (1.0.3)
     rack (1.6.4)
@@ -83,6 +86,7 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
+    rake (11.1.2)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
@@ -135,6 +139,7 @@ PLATFORMS
 
 DEPENDENCIES
   chef
+  passenger (~> 5.0.25)
   sinatra
   sinatra-contrib
 
