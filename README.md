@@ -29,7 +29,7 @@ bundle exec rackup
 
 The app will look for a `knife.rb` or / then `client.rb` to configure its Chef server api calls by default.
 
-Try out the app at http://localhost:9292/
+Try out the app at [localhost:9292](http://localhost:9292/).
 
 Optionally, configure a few things specific to the app using environment variables - these are defined a bit further down. You can also specify web server-type config options with `rackup` arguments, run `bundle exec rackup --help` to learn more about these.
 
