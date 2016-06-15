@@ -173,6 +173,22 @@ nodec:
   username: ${option.username}
 ```
 
+# Contributing
+
+1. Fork the repo in GitHub
+1. Create a branch (with a logical name like `feat/x` or `fix/y`)
+1. Make your changes (and add applicable tests)
+1. Create a pull request
+
+# Testing
+
+Tested with [`rspec`](http://rspec.info/) and [`chef-zero`](https://github.com/chef/chef-zero). You can execute the tests with:
+
+```shell
+$ bundle
+$ bundle exec rspec
+```
+
 # Improvements from the `chef-rundeck` Gem
 
 The biggest issue with oswaldlabs/chef-rundeck is that project node searches are defined in a config file (`/etc/chef/rundeck.json`), and to update a project's node search requires updating that config file and restarting `chef-rundeck`. Defining a Rundeck project's Chef node search query in a configuration file separate from the rest of the Rundeck project configuration (`project.properties`) doesn't make sense. `better-chef-rundeck` allows updating a Rundeck project's node search by simply updating the resource model source url.
