@@ -1,3 +1,4 @@
+require 'sinatra/base'
 require 'uri'
 require 'yaml'
 require 'chef'
@@ -28,9 +29,6 @@ class BetterChefRundeck < Sinatra::Base
     cache_dir: #{settings.cache_dir}
     cache_time: #{settings.cache_time}
     chef_config: #{settings.chef_config}
-    chef_server_url: #{settings.chef_server_url}
-    chef_client_name: #{settings.chef_client_name}
-    chef_client_key: #{settings.chef_client_key}
     EOS
   end
 
