@@ -32,6 +32,57 @@ class BetterChefRundeck < Sinatra::Base
     EOS
   end
 
+  # remove some extra keys Rack / Sinatra add to the params hash
+  def clean_params params_hsh
+    clone = params_hsh.clone
+    clone.delete 'splat'
+    clone.delete 'captures'
+    clone
+  end
+
+  # parse params hash for default_ and override_ keys
+  def get_defaults_overrides params_hsh
+    defaults, overrides = {}, {}
+    params_hsh.each do |k, v|
+      if k.match(/^default_.+/)
+        defaults[k.sub(/^default_/, '')] = v
+        params_hsh.delete k
+      elsif k.match(/^override_.+/)
+        overrides[k.sub(/^override_/, '')] = v
+        params_hsh.delete k
+      end
+    end
+    return params_hsh, defaults, overrides
+  end
+
+  # build a filter result for a chef partial search from the params hash
+  def get_filter_result params_hsh
+    default_filter_result = {
+      environment: ['chef_environment'],
+      fqdn:        ['fqdn'],
+      ip:          ['ipaddress'],
+      run_list:    ['run_list'],
+      roles:       ['roles'],
+      platform:    ['platform'],
+      tags:        ['tags'],
+    }
+    # always default name to name, it can still be overriden by specifying ?name=some,attr,path
+    filter_result = {name: ['name']}
+    # the only keys left in params_hsh should be for filter_result
+    if params_hsh.empty?
+      # if no GET params were given for filter_result to be generated, use the default
+      filter_result = filter_result.merge default_filter_result
+    else
+      # if some GET params were given for filter_result, use them instead
+      params_hsh.each do |k, v|
+        # TODO: logging
+        # logger.warn "attribute #{k} defaulted to nil" if v.nil?
+        filter_result[k] = v.split(',')
+      end
+    end
+    filter_result
+  end
+
   get /\/(.+:.+)/ do |q|
     # mkdir cache dir if needed
     Dir.mkdir(settings.cache_dir) unless File.directory?(settings.cache_dir)
@@ -52,45 +103,14 @@ class BetterChefRundeck < Sinatra::Base
 
     # search results not cached, logic continues to query the chef server
 
+    # clean sinatra extras from params hash
+    params_clone = clean_params params
+
     # set defaults and overrides from GET params
-    params_clone = params.clone
-    params_clone.delete 'splat'
-    params_clone.delete 'captures'
-    defaults, overrides = {}, {}
+    params_clone, defaults, overrides = get_defaults_overrides params_clone
 
-    params_clone.each do |k, v|
-      if k.match(/^default_.+/)
-        defaults[k.sub(/^default_/, '')] = v
-        params_clone.delete k
-      elsif k.match(/^override_.+/)
-        overrides[k.sub(/^override_/, '')] = v
-        params_clone.delete k
-      end
-    end
-
-    # always default name to name, it can still be overriden by specifying ?name=some,attr,path
-    filter_result = {name: ['name']}
-    # the only keys left in params_clone are for filter_result
-    if params_clone.empty?
-      # if no GET params were given for filter_result to be generated, use the default
-      default_filter_result = {
-        environment: ['chef_environment'],
-        fqdn:        ['fqdn'],
-        ip:          ['ipaddress'],
-        run_list:    ['run_list'],
-        roles:       ['roles'],
-        platform:    ['platform'],
-        tags:        ['tags'],
-      }
-      filter_result = filter_result.merge default_filter_result
-    else
-      # if some GET params were given for filter_result, use them instead
-      params_clone.each do |k, v|
-        # TODO: logging
-        # logger.warn "attribute #{k} defaulted to nil" if v.nil?
-        filter_result[k] = v.split(',')
-      end
-    end
+    # build a filter result for a chef partial search from the remaining GET params
+    filter_result = get_filter_result params_clone
 
     # query the chef server
     chef_nodes = Chef::Search::Query.new.search(:node, q, filter_result: filter_result)[0]
