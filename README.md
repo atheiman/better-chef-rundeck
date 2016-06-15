@@ -17,6 +17,10 @@ resources.source.1.type=url
 resources.source.1.config.url=http\://better-chef-rundeck.example.com/role:webserver
 ```
 
+## Improvements from the `chef-rundeck` Gem
+
+The biggest issue with [oswaldlabs/chef-rundeck](https://github.com/oswaldlabs/chef-rundeck) is that project node searches are defined in a config file (`/etc/chef/rundeck.json`), and to update a project's node search requires updating that config file and restarting `chef-rundeck`. Defining a Rundeck project's Chef node search query in a configuration file separate from the rest of the Rundeck project configuration (`project.properties`) doesn't make sense. `better-chef-rundeck` allows updating a Rundeck project's node search by simply updating the resource model source url.
+
 # Running the App
 
 ## Local Development
@@ -188,7 +192,3 @@ Tested with [`rspec`](http://rspec.info/) and [`chef-zero`](https://github.com/c
 $ bundle
 $ bundle exec rspec
 ```
-
-# Improvements from the `chef-rundeck` Gem
-
-The biggest issue with oswaldlabs/chef-rundeck is that project node searches are defined in a config file (`/etc/chef/rundeck.json`), and to update a project's node search requires updating that config file and restarting `chef-rundeck`. Defining a Rundeck project's Chef node search query in a configuration file separate from the rest of the Rundeck project configuration (`project.properties`) doesn't make sense. `better-chef-rundeck` allows updating a Rundeck project's node search by simply updating the resource model source url.
