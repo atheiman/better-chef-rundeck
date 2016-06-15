@@ -67,9 +67,9 @@ If the same Chef search is called within the specified cache seconds setting, th
 
 ## Which Attributes to Return from Chef
 
-Read [filtering Chef search returned attributes](https://docs.chef.io/chef_search.html#filter-search-results) for information about `filter_result` (originally referred to as `partial_search`).
+Read [filtering Chef search returned attributes](https://docs.chef.io/chef_search.html#filter-search-results) for information about `filter_result` (sometimes referred to as `partial_search`).
 
-No, I'm serious. Go read it. It's not even long.
+Seriously, go read it. It's not even long and it will make understanding this next bit *much* easier.
 
 Specify which Chef node attributes should be in the returned data (`filter_result`) using GET parameters. **If these GET parameters are not set, the normal Chef attributes will be returned (which may or may not be what is wanted, especially in a very large environment).** Specify the attribute name as the GET param and the Chef attribute path as a comma-delimited list (`some,attribute,path`, `languages,ruby,version`) as the value of the GET param. So to convert the attribute `['really']['deep']['attr']` into the attribute `short`, use the GET param `short=really,deep,attr`.
 
@@ -91,7 +91,7 @@ somenode:
 Request:
 
 ```yaml
-# GET /name:somenode?ip:ipaddress&kernel_version:kernel,version&ruby_version:languages,ruby,version
+# GET /name:somenode?ip=ipaddress&kernel_version=kernel,version&ruby_version=languages,ruby,version
 
 ---
 somenode:
@@ -123,7 +123,7 @@ anothernode:
 A request without specifying `filter_result` GET params would return exactly the data above. But a request specifying only the `filter_result` GET params `ip=ipaddress` and `ruby_version=languages,ruby,version` will not get all the attributes back because the request did not specify them:
 
 ```yaml
-# GET /name:anothernode?ip:ipaddress&ruby_version:languages,ruby,version
+# GET /name:anothernode?ip=ipaddress&ruby_version=languages,ruby,version
 
 ---
 anothernode:
