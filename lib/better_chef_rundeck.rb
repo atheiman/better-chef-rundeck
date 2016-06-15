@@ -1,5 +1,6 @@
 require 'uri'
 require 'yaml'
+require 'chef'
 
 class BetterChefRundeck < Sinatra::Base
   class Error < StandardError
