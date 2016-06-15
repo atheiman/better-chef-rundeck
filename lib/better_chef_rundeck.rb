@@ -42,15 +42,15 @@ class BetterChefRundeck < Sinatra::Base
     end
 
     # name cache files <query>.yml
-    cache_file = File.join(settings.cache_dir,
-                           URI.escape(q + request.query_string).gsub(/\//, '__SLASH__')) + '.yml'
+    cache_file = File.join(
+      settings.cache_dir,
+      URI.escape(q + request.query_string).gsub(/\//, '__SLASH__')
+    ) + '.yml'
 
     # send the cache file if it exists
     send_file cache_file if File.exists? cache_file
 
-    # search results not cached, query the chef server
-    # TODO: generate chef config from cli options if provided
-    Chef::Config.from_file(File.expand_path(settings.chef_config))
+    # search results not cached, logic continues to query the chef server
 
     # set defaults and overrides from GET params
     params_clone = params.clone

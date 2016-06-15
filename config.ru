@@ -45,4 +45,6 @@ Cannot create query Chef server without necessary config. Do one of the followin
 EOM
 end
 
+Chef::Config.from_file(File.expand_path(App.settings.chef_config))
+
 run App
