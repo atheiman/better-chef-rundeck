@@ -19,7 +19,6 @@ describe BetterChefRundeck do
     chef_objects = JSON.parse(File.read(chef_objects_file))
     chef_objects['environments'].each { |env| ridley.environment.create env }
     chef_objects['nodes'].each { |node| ridley.node.create node }
-    puts ridley.node.all
   end
 
   context 'with nodes loaded into chef server' do
@@ -33,7 +32,32 @@ describe BetterChefRundeck do
       get '/*:*'
       expect(last_response).to be_ok
       nodes = YAML.load(last_response.body)
-      expect(nodes.keys).to eq(['bcr-node', 'node-1', 'node-2'])
+      expect(nodes).to eq(
+        {"bcr-node"=>
+          {"environment"=>"bcr_env",
+           "fqdn"=>nil,
+           "ip"=>nil,
+           "run_list"=>["recipe[global_cookbook]", "role[bcr_role]"],
+           "roles"=>nil,
+           "platform"=>nil,
+           "tags"=>nil},
+         "node-1"=>
+          {"environment"=>"env_one",
+           "fqdn"=>nil,
+           "ip"=>nil,
+           "run_list"=>["recipe[global_cookbook]", "role[node_one_role]"],
+           "roles"=>nil,
+           "platform"=>nil,
+           "tags"=>nil},
+         "node-2"=>
+          {"environment"=>"env_two",
+           "fqdn"=>nil,
+           "ip"=>nil,
+           "run_list"=>["recipe[global_cookbook]", "role[node_two_role]"],
+           "roles"=>nil,
+           "platform"=>nil,
+           "tags"=>nil}}
+      )
     end
   end
 
