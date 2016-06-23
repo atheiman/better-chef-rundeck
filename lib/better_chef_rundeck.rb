@@ -83,20 +83,27 @@ class BetterChefRundeck < Sinatra::Base
     filter_result
   end
 
-  get /\/(.+:.+)/ do |q|
-    # mkdir cache dir if needed
+  def prep_cache_dir
+    # make the cache dir if it doesnt exist
     Dir.mkdir(settings.cache_dir) unless File.directory?(settings.cache_dir)
-
-    # delete old cache files
+    # delete files older than cache time setting
     Dir.glob(File.join(File.expand_path(settings.cache_dir), '*')).each do |f|
       File.delete f if (Time.now - File.mtime(f)) > settings.cache_time.to_f
     end
+  end
 
-    # name cache files <query>.yml
-    cache_file = File.join(
+  # name cache files <query>[?GET=params[&more=params...]].yml
+  def self.cache_filename str
+    File.join(
       settings.cache_dir,
-      URI.escape(q + request.query_string).gsub(/\//, '__SLASH__')
+      URI.escape(str).gsub(/\//, '__SLASH__') # files cannot have slashes in their name
     ) + '.yml'
+  end
+
+  get /\/(.+:.+)/ do |query|
+    prep_cache_dir
+
+    cache_file = BetterChefRundeck.cache_filename(query + request.query_string)
 
     # send the cache file if it exists
     send_file cache_file if File.exists? cache_file
@@ -113,7 +120,7 @@ class BetterChefRundeck < Sinatra::Base
     filter_result = get_filter_result params_clone
 
     # query the chef server
-    chef_nodes = Chef::Search::Query.new.search(:node, q, filter_result: filter_result)[0]
+    chef_nodes = Chef::Search::Query.new.search(:node, query, filter_result: filter_result)[0]
 
     # format nodes for yaml: {<name>: {<attr>: <value>, <attr>: <value>}}
     formatted_nodes = {}

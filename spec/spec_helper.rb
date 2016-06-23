@@ -11,9 +11,7 @@ BetterChefRundeck.configure do
     cache_dir:  File.join(File.dirname(__FILE__), '..', 'cache'),
     cache_time: 30,
     chef_config: File.join(File.dirname(__FILE__), 'chef-fixtures', 'knife.rb'),
-  }.each do |k, v|
-    BetterChefRundeck.set k, v
-  end
+  }.each { |k, v| BetterChefRundeck.set k, v }
 end
 
 module RSpecMixin

@@ -1,8 +1,7 @@
 require 'spec_helper'
 require 'chef_zero/server'
 require 'ridley'
-# get rid of Celluloid::TaskFiber warnings
-Ridley::Logging.logger.level = Logger.const_get 'ERROR'
+Ridley::Logging.logger.level = Logger.const_get 'ERROR' # get rid of Celluloid::TaskFiber warnings
 require 'json'
 require 'yaml'
 
@@ -58,6 +57,20 @@ describe BetterChefRundeck do
            "platform"=>nil,
            "tags"=>nil}}
       )
+    end
+
+    it 'should cache returned yaml' do
+      # clear the cache dir
+      Dir.glob(File.join BetterChefRundeck.settings.cache_dir, '*').each { |f| File.delete f }
+
+      # create the cache file
+      url = '/chef_environment:env_*'
+      get url
+      expect(last_response).to be_ok
+
+      # the cache file should exist
+      cache_file = BetterChefRundeck.cache_filename(url[1..-1])
+      expect(File.exist?(cache_file)).to be true
     end
   end
 
