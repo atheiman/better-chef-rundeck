@@ -195,4 +195,4 @@ $ bundle
 $ bundle exec rake spec
 ```
 
-Tests are built with [Travis CI](https://travis-ci.org/atheiman/better-chef-rundeck) on all pushes.
+Tests are built with [Travis CI](https://travis-ci.org/atheiman/better-chef-rundeck) on all pushes. Tests require chef-zero, which requires Ruby version `>= 2.1.0`, so tests are only run for those versions of Ruby. However, the app itself should work on older versions of Ruby.
