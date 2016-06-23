@@ -192,5 +192,7 @@ Tested with [`rspec`](http://rspec.info/) and [`chef-zero`](https://github.com/c
 
 ```shell
 $ bundle
-$ bundle exec rspec
+$ bundle exec rake spec
 ```
+
+Tests are built with [Travis CI](https://travis-ci.org/atheiman/better-chef-rundeck) on all pushes.

@@ -192,6 +192,7 @@ DEPENDENCIES
   chef (~> 12.11)
   chef-zero
   passenger (~> 5.0)
+  rake
   ridley
   sinatra (~> 1.4)
   sinatra-contrib
