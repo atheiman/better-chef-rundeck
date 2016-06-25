@@ -1,6 +1,6 @@
 # Better Chef Rundeck
 
-[![GitHub release](https://img.shields.io/github/release/atheiman/better-chef-rundeck.svg?maxAge=2592000)](https://github.com/atheiman/better-chef-rundeck/releases/latest) [![Travis](https://img.shields.io/travis/atheiman/better-chef-rundeck.svg?maxAge=2592000)](https://travis-ci.org/atheiman/better-chef-rundeck)
+[![GitHub release](https://img.shields.io/github/release/atheiman/better-chef-rundeck.svg?maxAge=3600)](https://github.com/atheiman/better-chef-rundeck/releases/latest) [![Travis](https://img.shields.io/travis/atheiman/better-chef-rundeck.svg?maxAge=3600)](https://travis-ci.org/atheiman/better-chef-rundeck)
 
 A Sinatra app for integrating Chef and Rundeck - a Chef search query is sent as an HTTP GET request to the app at the path `/<key>:<search_term>` and the app will query the Chef server and return the nodes and their attributes in a format suitable for a Rundeck project's [resource model source](http://rundeck.org/docs/administration/managing-node-sources.html#resource-model-source).
 
