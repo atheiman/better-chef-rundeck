@@ -8,5 +8,5 @@ group :development do
   gem 'sinatra-contrib'
   gem 'chef-zero'
   gem 'ridley'
-  gem 'rake'
+  gem 'rubocop'
 end

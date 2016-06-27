@@ -24,7 +24,7 @@ class BetterChefRundeck < Sinatra::Base
 
   get '/' do
     content_type 'text/plain'
-    content = <<-EOS.gsub /^\s+/, ""
+    <<-EOS.gsub(/^\s+/, "")
     #{BetterChefRundeck.app_name} is up and running!
     cache_dir: #{settings.cache_dir}
     cache_time: #{settings.cache_time}
@@ -100,13 +100,13 @@ class BetterChefRundeck < Sinatra::Base
     ) + '.yml'
   end
 
-  get /\/(.+:.+)/ do |query|
+  get(/\/(.+:.+)/) do |query|
     prep_cache_dir
 
     cache_file = BetterChefRundeck.cache_filename(query + request.query_string)
 
     # send the cache file if it exists
-    send_file cache_file if File.exists? cache_file
+    send_file cache_file if File.exist? cache_file
 
     # search results not cached, logic continues to query the chef server
 
@@ -133,7 +133,7 @@ attribute to the attribute path `#{params['name']}` in your GET parameters \
       end
 
       # merge in default attributes (overwrite nil node attributes)
-      node.merge!(defaults) { |key, node_val, default_val| default_val if node_val.nil? }
+      node.merge!(defaults) { |_key, node_val, default_val| default_val if node_val.nil? }
       # merge in override attributes (overwrite all node attributes)
       node.merge!(overrides)
       formatted_nodes[node.delete('name')] = node

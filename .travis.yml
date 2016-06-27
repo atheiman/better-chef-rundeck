@@ -3,4 +3,6 @@ rvm:
   - 2.3.1
   - 2.2.5
   - 2.1.9
-script: bundle exec rspec
+script:
+- bundle exec rubocop --lint --display-style-guide --extra-details --display-cop-names
+- bundle exec rspec

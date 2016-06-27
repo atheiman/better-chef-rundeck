@@ -17,7 +17,7 @@ defaults = {
 # defaulting the chef config file is more complicated
 default_chef_configs = ['~/.chef/knife.rb', '/etc/chef/client.rb']
 default_chef_configs.each do |c|
-  if File.exists?(File.expand_path(c))
+  if File.exist?(File.expand_path(c))
     defaults[:chef_config] = c
     break
   end
@@ -37,7 +37,7 @@ end
 # end
 
 # ensure chef api client can be initialized
-unless File.exists?(File.expand_path(App.settings.chef_config))
+unless File.exist?(File.expand_path(App.settings.chef_config))
   raise App::Error, <<-EOM
 Cannot create query Chef server without necessary config. Do one of the following:
   - Create a chef config file at #{(default_chef_configs).join(', or ')}
