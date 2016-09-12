@@ -64,7 +64,7 @@ The app is configured with shell environment variables. These env vars are names
 Environment Variable | Explanation | Default Value
 -------------------- | ----------- | -------------
 `BCR_CACHE_DIR` | Chef search results are stored in this directory for cached responses | `/tmp/better-chef-rundeck-cache`
-`BCR_CACHE_TIME` | Cached responses are stored for this many seconds | `30`
+`BCR_CACHE_TIME` | Cached responses are stored for this many seconds | `10`
 `BCR_CHEF_CONFIG` | Path to a Chef config file | First that exists in `['~/.chef/knife.rb', '/etc/chef/client.rb']`
 
 ## Caching
