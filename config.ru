@@ -11,7 +11,7 @@ App = BetterChefRundeck
 # default settings for the app
 defaults = {
   cache_dir:  File.join('/', 'tmp', App.app_name + '-cache'),
-  cache_time: 30,
+  cache_time: 10,
   chef_config: nil,
 }
 # defaulting the chef config file is more complicated
