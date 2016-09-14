@@ -26,8 +26,6 @@ class BetterChefRundeck < Sinatra::Base
     content_type 'text/plain'
     <<-EOS.gsub(/^\s+/, "")
     #{BetterChefRundeck.app_name} is up and running!
-    cache_dir: #{settings.cache_dir}
-    cache_time: #{settings.cache_time}
     chef_config: #{settings.chef_config}
     EOS
   end
@@ -83,33 +81,7 @@ class BetterChefRundeck < Sinatra::Base
     filter_result
   end
 
-  def prep_cache_dir
-    # make the cache dir if it doesnt exist
-    Dir.mkdir(settings.cache_dir) unless File.directory?(settings.cache_dir)
-    # delete files older than cache time setting
-    Dir.glob(File.join(File.expand_path(settings.cache_dir), '*')).each do |f|
-      File.delete f if (Time.now - File.mtime(f)) > settings.cache_time.to_f
-    end
-  end
-
-  # name cache files <query>[?GET=params[&more=params...]].yml
-  def self.cache_filename str
-    File.join(
-      settings.cache_dir,
-      URI.escape(str).gsub(/\//, '__SLASH__') # files cannot have slashes in their name
-    ) + '.yml'
-  end
-
   get(/\/(.+:.+)/) do |query|
-    prep_cache_dir
-
-    cache_file = BetterChefRundeck.cache_filename(query + request.query_string)
-
-    # send the cache file if it exists
-    send_file cache_file if File.exist? cache_file
-
-    # search results not cached, logic continues to query the chef server
-
     # clean sinatra extras from params hash
     params_clone = clean_params params
 
@@ -139,10 +111,7 @@ attribute to the attribute path `#{params['name']}` in your GET parameters \
       formatted_nodes[node.delete('name')] = node
     end
 
-    # create the cache file
-    File.write(cache_file, formatted_nodes.to_yaml)
-
-    # send the cache file
-    send_file cache_file
+    # send the nodes
+    formatted_nodes.to_yaml
   end
 end

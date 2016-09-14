@@ -8,9 +8,7 @@ ENV['RACK_ENV'] = 'test'
 # configure the app settings (this is done similarly in config.ru)
 BetterChefRundeck.configure do
   {
-    cache_dir:  File.join(File.dirname(__FILE__), '..', 'cache'),
-    cache_time: 30,
-    chef_config: File.join(File.dirname(__FILE__), 'chef-fixtures', 'knife.rb'),
+    chef_config: File.join(File.dirname(__FILE__), 'chef-fixtures', 'knife.rb')
   }.each { |k, v| BetterChefRundeck.set k, v }
 end
 
