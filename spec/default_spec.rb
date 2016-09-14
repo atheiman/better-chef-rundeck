@@ -58,20 +58,6 @@ describe BetterChefRundeck do
            "tags"=>nil}}
       )
     end
-
-    it 'should cache returned yaml' do
-      # clear the cache dir
-      Dir.glob(File.join BetterChefRundeck.settings.cache_dir, '*').each { |f| File.delete f }
-
-      # create the cache file
-      url = '/chef_environment:env_*'
-      get url
-      expect(last_response).to be_ok
-
-      # the cache file should exist
-      cache_file = BetterChefRundeck.cache_filename(url[1..-1])
-      expect(File.exist?(cache_file)).to be true
-    end
   end
 
   after(:context) do

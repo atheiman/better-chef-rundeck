@@ -10,9 +10,7 @@ App = BetterChefRundeck
 
 # default settings for the app
 defaults = {
-  cache_dir:  File.join('/', 'tmp', App.app_name + '-cache'),
-  cache_time: 10,
-  chef_config: nil,
+  chef_config: nil
 }
 # defaulting the chef config file is more complicated
 default_chef_configs = ['~/.chef/knife.rb', '/etc/chef/client.rb']
@@ -28,7 +26,7 @@ App.configure do
   # environment variables override default values
   # APP_SOME_SETTING env var overrides :some_setting default
   defaults.each { |k, v| App.set k, ENV[App.to_env_var k] || v }
-  # settings are stored as strings. reference cache time with settings.cache_time.to_f
+  # settings are stored as strings
 end
 
 # App.configure :production, :development do
