@@ -30,6 +30,7 @@ describe BetterChefRundeck do
     it '/*:* should return all nodes with default filter result' do
       get '/*:*'
       expect(last_response).to be_ok
+      expect(last_response.headers['Content-Type']).to match(/text\/yaml/)
       nodes = YAML.load(last_response.body)
       expect(nodes).to eq(
         {"bcr-node"=>

@@ -82,6 +82,8 @@ class BetterChefRundeck < Sinatra::Base
   end
 
   get(/\/(.+:.+)/) do |query|
+    content_type 'text/yaml'
+
     # clean sinatra extras from params hash
     params_clone = clean_params params
 
