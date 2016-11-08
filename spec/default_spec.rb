@@ -59,6 +59,16 @@ describe BetterChefRundeck do
            "tags"=>nil}}
       )
     end
+
+    it 'filter result should be created based on GET params' do
+      get '/chef_environment:env_one?ipaddress&fqdn&deep_attr=deep,nested,attribute'
+      expect(last_response).to be_ok
+      expect(last_response.headers['Content-Type']).to match(/text\/yaml/)
+      nodes = YAML.load(last_response.body)
+      expect(nodes).to eq(
+        {"node-1"=>{"ipaddress"=>nil, "fqdn"=>nil, "deep_attr"=>0}}
+      )
+    end
   end
 
   after(:context) do

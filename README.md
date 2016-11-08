@@ -73,7 +73,7 @@ Read [filtering Chef search returned attributes](https://docs.chef.io/chef_searc
 
 Seriously, go read it. It's not even long and it will make understanding this next bit *much* easier.
 
-Specify which Chef node attributes should be in the returned data (`filter_result`) using GET parameters. **If these GET parameters are not set, the normal Chef attributes will be returned (which may or may not be what is wanted, especially in a very large environment).** Specify the attribute name as the GET param and the Chef attribute path as a comma-delimited list (`some,attribute,path`, `languages,ruby,version`) as the value of the GET param. So to convert the attribute `['really']['deep']['attr']` into the attribute `short`, use the GET param `short=really,deep,attr`.
+Specify which Chef node attributes should be in the returned data (`filter_result`) using GET parameters. **If these GET parameters are not set, the normal Chef attributes will be returned (which may or may not be what is wanted, especially in a very large environment).** Specify the attribute name as the GET param and the Chef attribute path as a comma-delimited list (`some,attribute,path`, `languages,ruby,version`) as the value of the GET param. So to convert the attribute `['really']['deep']['attr']` into the attribute `short`, use the GET param `short=really,deep,attr`. If a value is not provided for the GET param, the key will be used as the value (`?ipaddress=ipaddress` is unnecessary, you can get the same result with `?ipaddress`).
 
 ### Example `filter_result` GET parameters
 
@@ -93,11 +93,11 @@ somenode:
 Request:
 
 ```yaml
-# GET /name:somenode?ip=ipaddress&kernel_version=kernel,version&ruby_version=languages,ruby,version
+# GET /name:somenode?ipaddress&kernel_version=kernel,version&ruby_version=languages,ruby,version
 
 ---
 somenode:
-  ip: 10.11.12.13
+  ipaddress: 10.11.12.13
   kernel_version: 7.8.9
   ruby_version: 2.1.0
 ```
