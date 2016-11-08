@@ -57,6 +57,13 @@ This app can easily be run with [Passenger standalone](https://www.phusionpassen
 
 Additionally, configure the app with a `Passengerfile.json` or `passenger`'s command line arguments. [Here is a reference for those config options](https://www.phusionpassenger.com/library/config/standalone/reference/). In addition to common web server-type config options, there are config options specific to this app that can be configured with environment variables. These can be set in the shell of the user running the app with `export ENVVAR=VALUE`, or with [passenger command line args or `Passengerfile.json`](https://www.phusionpassenger.com/library/config/standalone/reference/#--envvar-envvars). These options are described below:
 
+## With Docker
+
+```shell
+docker build -t better-chef-rundeck .
+docker run -d -p 80 -v $HOME/.chef:/home/app/.chef better-chef-rundeck
+```
+
 ## Configuration
 
 The app is configured with shell environment variables. These env vars are namespaced to not be overwritten by other programs. It should be clear that the app will run fine with the default configuration, and setting any of these env vars is not required.
