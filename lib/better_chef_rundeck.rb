@@ -73,9 +73,13 @@ class BetterChefRundeck < Sinatra::Base
     else
       # if some GET params were given for filter_result, use them instead
       params_hsh.each do |k, v|
-        # TODO: logging
-        # logger.warn "attribute #{k} defaulted to nil" if v.nil?
-        filter_result[k] = v.split(',')
+        if v.nil?
+          # attribute path not specified, assume key is attribute path
+          filter_result[k] = [k]
+        else
+          # attribute path specified
+          filter_result[k] = v.split(',')
+        end
       end
     end
     filter_result
