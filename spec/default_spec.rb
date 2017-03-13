@@ -69,6 +69,18 @@ describe BetterChefRundeck do
         {"node-1"=>{"ipaddress"=>nil, "fqdn"=>nil, "deep_attr"=>0}}
       )
     end
+
+    it 'appends values when using append_ variable names' do
+      get '/chef_environment:env_one?hostname=name&append_hostname=.example.com'
+      expect(last_response).to be_ok
+      expect(last_response.headers['Content-Type']).to match(%r{text\/yaml})
+      nodes = YAML.safe_load(last_response.body)
+      expect(nodes).to eq(
+        'node-1' => {
+          'hostname' => 'node-1.example.com'
+        }
+      )
+    end
   end
 
   after(:context) do

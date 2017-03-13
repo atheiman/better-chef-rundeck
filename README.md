@@ -182,6 +182,38 @@ nodec:
   username: ${option.username}
 ```
 
+## `append_`ing Attributes
+
+In order to append static text to node attributes, set the GET parameter `append_<attr>=<value>` to append `<value>` to `<attr>` (you can combine this with `default_` or `override_`).
+
+A use case for `append_` attributes is setting the SSH port of nodes (in case all your nodes have non-standard SSH ports)
+
+To illustrate this, three Chef nodes with different attributes (some attributes unset, some `nil`):
+
+```yaml
+---
+nodea:
+  fqdn: nodea
+nodeb:
+  fqdn: nodeb
+nodec:
+  fqdn: nodec
+```
+
+This request would return something similar to the following:
+
+```yaml
+# GET /*:*?hostname=fqdn&append_hostname=:22222
+
+---
+nodea:
+  fqdn: nodea:22222
+nodeb:
+  fqdn: nodeb:22222
+nodec:
+  fqdn: nodec:22222
+```
+
 # Contributing
 
 1. Fork the repo in GitHub
