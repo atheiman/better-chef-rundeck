@@ -36,6 +36,7 @@ describe BetterChefRundeck do
         {"bcr-node"=>
           {"environment"=>"bcr_env",
            "fqdn"=>nil,
+           "hostname"=>nil,
            "ip"=>nil,
            "run_list"=>["recipe[global_cookbook]", "role[bcr_role]"],
            "roles"=>nil,
@@ -44,6 +45,7 @@ describe BetterChefRundeck do
          "node-1"=>
           {"environment"=>"env_one",
            "fqdn"=>nil,
+           "hostname"=>nil,
            "ip"=>nil,
            "run_list"=>["recipe[global_cookbook]", "role[node_one_role]"],
            "roles"=>nil,
@@ -52,6 +54,7 @@ describe BetterChefRundeck do
          "node-2"=>
           {"environment"=>"env_two",
            "fqdn"=>nil,
+           "hostname"=>nil,
            "ip"=>nil,
            "run_list"=>["recipe[global_cookbook]", "role[node_two_role]"],
            "roles"=>nil,
