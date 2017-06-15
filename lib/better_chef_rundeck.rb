@@ -58,6 +58,7 @@ class BetterChefRundeck < Sinatra::Base
     default_filter_result = {
       environment: ['chef_environment'],
       fqdn:        ['fqdn'],
+      hostname:    ['fqdn'],
       ip:          ['ipaddress'],
       run_list:    ['run_list'],
       roles:       ['roles'],
