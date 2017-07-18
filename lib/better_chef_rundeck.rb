@@ -97,12 +97,10 @@ class BetterChefRundeck < Sinatra::Base
     # build a filter result for a chef partial search from the remaining GET params
     filter_result = get_filter_result params_clone
 
-    # query the chef server
-    chef_nodes = Chef::Search::Query.new.search(:node, query, filter_result: filter_result)[0]
-
     # format nodes for yaml: {<name>: {<attr>: <value>, <attr>: <value>}}
     formatted_nodes = {}
-    chef_nodes.each do |node|
+    # query the chef server
+    Chef::Search::Query.new.search(:node, query, filter_result: filter_result).each do |node|
       # 400 error if name attribute is nil
       if node['name'].nil?
         halt 400, "Error: node(s) missing name attribute. You've overriden the `name` \
