@@ -100,7 +100,7 @@ class BetterChefRundeck < Sinatra::Base
     # format nodes for yaml: {<name>: {<attr>: <value>, <attr>: <value>}}
     formatted_nodes = {}
     # query the chef server
-    Chef::Search::Query.new.search(:node, query, filter_result: filter_result).each do |node|
+    Chef::Search::Query.new.search(:node, query, filter_result: filter_result) do |node|
       # 400 error if name attribute is nil
       if node['name'].nil?
         halt 400, "Error: node(s) missing name attribute. You've overriden the `name` \
