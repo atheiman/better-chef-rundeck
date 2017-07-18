@@ -40,7 +40,7 @@ class BetterChefRundeck < Sinatra::Base
 
   # parse params hash for default_ and override_ keys
   def get_defaults_overrides params_hsh
-    defaults, overrides = {}, {}
+    defaults, overrides, appends = {}, {}, {}
     params_hsh.each do |k, v|
       if k.match(/^default_.+/)
         defaults[k.sub(/^default_/, '')] = v
@@ -48,9 +48,12 @@ class BetterChefRundeck < Sinatra::Base
       elsif k.match(/^override_.+/)
         overrides[k.sub(/^override_/, '')] = v
         params_hsh.delete k
+      elsif k.match(/^append_.+/)
+        appends[k.sub(/^append_/, '')] = v
+        params_hsh.delete k
       end
     end
-    return params_hsh, defaults, overrides
+    return params_hsh, defaults, overrides, appends
   end
 
   # build a filter result for a chef partial search from the params hash
@@ -92,7 +95,7 @@ class BetterChefRundeck < Sinatra::Base
     params_clone = clean_params params
 
     # set defaults and overrides from GET params
-    params_clone, defaults, overrides = get_defaults_overrides params_clone
+    params_clone, defaults, overrides, appends = get_defaults_overrides params_clone
 
     # build a filter result for a chef partial search from the remaining GET params
     filter_result = get_filter_result params_clone
@@ -112,6 +115,8 @@ attribute to the attribute path `#{params['name']}` in your GET parameters \
       node.merge!(defaults) { |_key, node_val, default_val| default_val if node_val.nil? }
       # merge in override attributes (overwrite all node attributes)
       node.merge!(overrides)
+      node.merge!(appends) { |_key, node_val, append_val| "#{node_val}#{append_val}" unless node_val.nil? }
+
       formatted_nodes[node.delete('name')] = node
     end
 
