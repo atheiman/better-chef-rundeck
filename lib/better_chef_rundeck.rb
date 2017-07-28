@@ -118,10 +118,10 @@ class BetterChefRundeck < Sinatra::Base
     formatted_nodes = {}
 
     # processing query with organization(<organizatio>/<query>)
-    chef_server_url, serach_query = filter_organization(query)
+    chef_server_url, search_query = filter_organization(query)
 
     # query the chef server
-    Chef::Search::Query.new(chef_server_url).search(:node, serach_query, filter_result: filter_result) do |node|
+    Chef::Search::Query.new(chef_server_url).search(:node, search_query, filter_result: filter_result) do |node|
       # 400 error if name attribute is nil
       if node['name'].nil?
         halt 400, "Error: node(s) missing name attribute. You've overriden the `name` \
