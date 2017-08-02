@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'chef', '~> 12.11'
-gem 'sinatra', '~> 1.4'
+gem 'chef', '~> 13.2'
+gem 'sinatra', '~> 2.0'
 gem 'passenger', '~> 5.0', require: 'phusion_passenger/rack_handler'
 
 group :development do
@@ -9,4 +9,5 @@ group :development do
   gem 'chef-zero'
   gem 'ridley'
   gem 'rubocop'
+  gem 'rack-test'
 end
