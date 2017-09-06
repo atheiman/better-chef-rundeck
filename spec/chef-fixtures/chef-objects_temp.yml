@@ -1,0 +1,42 @@
+---
+environments:
+  bcr_env2: {}
+  temp_env: {}
+  temp_env2: {}
+nodes:
+  'bcr-node2':
+    chef_environment: 'bcr_env2'
+    run_list:
+      - 'recipe[global_cookbook]'
+      - 'role[bcr_role2]'
+    tags:
+      - 'bcr-tag2'
+      - 'global-tag'
+    default:
+      deep:
+        nested:
+          attribute: 0
+  'temp-node':
+    chef_environment: 'temp_env'
+    run_list:
+      - 'recipe[global_cookbook]'
+      - 'role[temp_role]'
+    tags:
+      - 'temp-tag'
+      - 'global-tag'
+    default:
+      deep:
+        nested:
+          attribute: 0
+  'temp-node2':
+    chef_environment: 'temp_env2'
+    run_list:
+      - 'recipe[global_cookbook]'
+      - 'role[temp_role2]'
+    tags:
+      - 'temp-tag2'
+      - 'global-tag'
+    default:
+      deep:
+        nested:
+          attribute: 0
