@@ -21,11 +21,13 @@ resources.source.1.config.url=http\://better-chef-rundeck.example.com/role:webse
 
 The returned data includes Chef attributes that will be attached to nodes in Rundeck, allowing users to search for nodes in Rundeck based on Chef attributes.
 
+Additionally, you can specify specific organization if you have multiple chef organization.
+
 ```
-GET /organization/role:webserver
+GET /<organization>/role:webserver
 ```
 
-will return the same result as above method for specified organization.
+Above request will return the same result if you type the full name of your default organization. By chaning value of <organization>, you can query the same request to other existing chef organizations.
 
 ## Improvements from the `chef-rundeck` Gem
 
