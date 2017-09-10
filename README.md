@@ -21,6 +21,14 @@ resources.source.1.config.url=http\://better-chef-rundeck.example.com/role:webse
 
 The returned data includes Chef attributes that will be attached to nodes in Rundeck, allowing users to search for nodes in Rundeck based on Chef attributes.
 
+Additionally, you can specify specific organization if you have multiple chef organization.
+
+```
+GET /<organization>/role:webserver
+```
+
+Above request will return the same result if you type the full name of your default organization. By chaning value of <organization>, you can query the same request to other existing chef organizations.
+
 ## Improvements from the `chef-rundeck` Gem
 
 The biggest issue with [oswaldlabs/chef-rundeck](https://github.com/oswaldlabs/chef-rundeck) is that project node searches are defined in a config file (`/etc/chef/rundeck.json`). Updating a project's node search with `chef-rundeck` requires updating `/etc/chef/rundeck.json` and then restarting `chef-rundeck`. Defining a Rundeck project's Chef node search query in `/etc/chef/rundeck.json` separate from the rest of the Rundeck project configuration (`project.properties`) doesn't make sense. `better-chef-rundeck` allows updating a Rundeck project's node search by simply updating the resource model source url in `project.properties`.

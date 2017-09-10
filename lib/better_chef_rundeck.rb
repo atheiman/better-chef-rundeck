@@ -88,6 +88,20 @@ class BetterChefRundeck < Sinatra::Base
     filter_result
   end
 
+  def filter_organization(query)
+    return nil, query unless query =~ %r{\w+/.+:.+}
+
+    organization, search_query = query.split('/')
+    chef_server_url = Chef::Config[:chef_server_url]
+
+    splitted = chef_server_url.split('/')
+    splitted.pop
+    splitted.push(organization)
+    chef_server_url = splitted.join('/')
+
+    return chef_server_url, search_query
+  end
+
   get(/\/(.+:.+)/) do |query|
     content_type 'text/yaml'
 
@@ -102,8 +116,12 @@ class BetterChefRundeck < Sinatra::Base
 
     # format nodes for yaml: {<name>: {<attr>: <value>, <attr>: <value>}}
     formatted_nodes = {}
+
+    # processing query with organization(<organizatio>/<query>)
+    chef_server_url, search_query = filter_organization(query)
+
     # query the chef server
-    Chef::Search::Query.new.search(:node, query, filter_result: filter_result) do |node|
+    Chef::Search::Query.new(chef_server_url).search(:node, search_query, filter_result: filter_result) do |node|
       # 400 error if name attribute is nil
       if node['name'].nil?
         halt 400, "Error: node(s) missing name attribute. You've overriden the `name` \
