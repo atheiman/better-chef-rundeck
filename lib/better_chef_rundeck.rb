@@ -4,6 +4,8 @@ require 'yaml'
 require 'chef'
 
 class BetterChefRundeck < Sinatra::Base
+  VERSION = '1.0.0'
+
   class Error < StandardError
   end
 
