@@ -1,8 +1,11 @@
 language: ruby
+cache: bundler
+gemfile:
+- Gemfile
+- chef-12.Gemfile
 rvm:
-  - 2.3.1
-  - 2.2.5
-  - 2.1.9
+- 2.4.2
+- 2.3.5
 script:
 - bundle exec rubocop --lint --display-style-guide --extra-details --display-cop-names
 - bundle exec rspec

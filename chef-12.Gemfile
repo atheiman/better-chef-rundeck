@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'chef'
+gem 'chef', '~> 12.21'
 gem 'passenger', require: 'phusion_passenger/rack_handler'
 gem 'sinatra'
 
