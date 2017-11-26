@@ -24,6 +24,41 @@ describe BetterChefRundeck do
     @server.start_background
   end
 
+  let(:main_nodes) do
+    {"bcr-node"=>
+      {"environment"=>"bcr_env",
+       "fqdn"=>nil,
+       "ip"=>nil,
+       "run_list"=>["recipe[global_cookbook]", "role[bcr_role]"],
+       "roles"=>nil,
+       "platform"=>nil,
+       "tags"=>["bcr-tag", "global-tag"]},
+     "node-1"=>
+      {"environment"=>"env_one",
+       "fqdn"=>nil,
+       "ip"=>nil,
+       "run_list"=>["recipe[global_cookbook]", "role[node_one_role]"],
+       "roles"=>nil,
+       "platform"=>nil,
+       "tags"=>["node-1-tag", "global-tag"]},
+     "node-2"=>
+      {"environment"=>"env_two",
+       "fqdn"=>nil,
+       "ip"=>nil,
+       "run_list"=>["recipe[global_cookbook]", "role[node_two_role]"],
+       "roles"=>nil,
+       "platform"=>nil,
+       "tags"=>["node-2-tag", "global-tag"]},
+     "node-3"=>
+      {"environment"=>"_default",
+       "fqdn"=>nil,
+       "ip"=>nil,
+       "run_list"=>["recipe[global_cookbook]"],
+       "roles"=>nil,
+       "platform"=>nil,
+       "tags"=>[]}}
+  end
+
   context 'with nodes loaded into chef server' do
     it '/ should respond ok' do
       get '/'
@@ -37,32 +72,7 @@ describe BetterChefRundeck do
         expect(last_response).to be_ok
         expect(last_response.headers['Content-Type']).to match(/text\/yaml/)
         nodes = YAML.load(last_response.body)
-        expect(nodes).to eq(
-          {"bcr-node"=>
-            {"environment"=>"bcr_env",
-             "fqdn"=>nil,
-             "ip"=>nil,
-             "run_list"=>["recipe[global_cookbook]", "role[bcr_role]"],
-             "roles"=>nil,
-             "platform"=>nil,
-             "tags"=>["bcr-tag", "global-tag"]},
-           "node-1"=>
-            {"environment"=>"env_one",
-             "fqdn"=>nil,
-             "ip"=>nil,
-             "run_list"=>["recipe[global_cookbook]", "role[node_one_role]"],
-             "roles"=>nil,
-             "platform"=>nil,
-             "tags"=>["node-1-tag", "global-tag"]},
-           "node-2"=>
-            {"environment"=>"env_two",
-             "fqdn"=>nil,
-             "ip"=>nil,
-             "run_list"=>["recipe[global_cookbook]", "role[node_two_role]"],
-             "roles"=>nil,
-             "platform"=>nil,
-             "tags"=>["node-2-tag", "global-tag"]}}
-        )
+        expect(nodes).to eq(main_nodes)
       end
 
       it '/main/*:* should return the same result as /*:*' do
@@ -70,32 +80,7 @@ describe BetterChefRundeck do
         expect(last_response).to be_ok
         expect(last_response.headers['Content-Type']).to match(/text\/yaml/)
         nodes = YAML.load(last_response.body)
-        expect(nodes).to eq(
-          {"bcr-node"=>
-            {"environment"=>"bcr_env",
-             "fqdn"=>nil,
-             "ip"=>nil,
-             "run_list"=>["recipe[global_cookbook]", "role[bcr_role]"],
-             "roles"=>nil,
-             "platform"=>nil,
-             "tags"=>["bcr-tag", "global-tag"]},
-           "node-1"=>
-            {"environment"=>"env_one",
-             "fqdn"=>nil,
-             "ip"=>nil,
-             "run_list"=>["recipe[global_cookbook]", "role[node_one_role]"],
-             "roles"=>nil,
-             "platform"=>nil,
-             "tags"=>["node-1-tag", "global-tag"]},
-           "node-2"=>
-            {"environment"=>"env_two",
-             "fqdn"=>nil,
-             "ip"=>nil,
-             "run_list"=>["recipe[global_cookbook]", "role[node_two_role]"],
-             "roles"=>nil,
-             "platform"=>nil,
-             "tags"=>["node-2-tag", "global-tag"]}}
-        )
+        expect(nodes).to eq(main_nodes)
       end
 
       it 'filter result should be created based on GET params' do
