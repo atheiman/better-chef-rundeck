@@ -40,3 +40,11 @@ nodes:
       deep:
         nested:
           attribute: 0
+  'node-3':
+    chef_environment: '_default'
+    run_list:
+      - 'recipe[global_cookbook]'
+    default:
+      deep:
+        nested:
+          attribute: 0
