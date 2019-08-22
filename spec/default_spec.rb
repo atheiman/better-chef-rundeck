@@ -93,6 +93,30 @@ describe BetterChefRundeck do
         )
       end
 
+      it 'filter result should be created based on GET params with merged tags' do
+        get '/chef_environment:env_one?chef_environment&the_run_list=run_list&tags=chef_environment$$$run_list$$$tags$$$deep,nested,attribute'
+        expect(last_response).to be_ok
+        expect(last_response.headers['Content-Type']).to match(/text\/yaml/)
+        nodes = YAML.load(last_response.body)
+        expect(nodes).to eq(
+          'node-1' => {
+            'chef_environment' => 'env_one',
+            'the_run_list' => [
+              'recipe[global_cookbook]',
+              'role[node_one_role]',
+            ],
+            'tags' => [
+              'env_one',
+              'recipe[global_cookbook]',
+              'role[node_one_role]',
+              'node-1-tag',
+              'global-tag',
+              0,
+            ]
+          }
+        )
+      end
+
       it 'appends values when using append_ variable names' do
         get '/chef_environment:env_one?hostname=name&append_hostname=.example.com'
         expect(last_response).to be_ok

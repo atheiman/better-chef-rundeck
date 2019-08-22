@@ -222,6 +222,48 @@ nodec:
   fqdn: nodec:22222
 ```
 
+## Merging attributes in `tags` attribute
+
+In order to merge the values of multiple attributes in the `tags` attribute, you can set the
+`tags` GET parameter to the list of attributes you want to merge joined with `$$$`. The result
+for the `tags` attribute will then be flattened. For example:
+
+Chef node:
+
+```yaml
+---
+anothernode:
+  environment: prod
+  fqdn: anothernode.example.com
+  ipaddress: 100.101.102.103
+  run_list: 
+  - recipe[base_os]
+  - role[webserver]
+  roles:
+  - webserver
+  platform: redhat
+  tags:
+  - rundeck-managed
+  - some-tag
+```
+
+```yaml
+# GET /name:anothernode?env=environment&roles&tags=environment$$$roles$$$run_list$$$tags
+
+---
+anothernode:
+  env: prod
+  roles:
+  - webserver
+  tags:
+  - prod
+  - webserver
+  - recipe[base_os]
+  - role[webserver]
+  - rundeck-managed
+  - some-tag
+```
+
 # Contributing
 
 1. Fork the repo in GitHub
