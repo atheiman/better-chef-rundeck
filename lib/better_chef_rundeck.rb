@@ -4,7 +4,7 @@ require 'yaml'
 require 'chef'
 
 class BetterChefRundeck < Sinatra::Base
-  VERSION = '1.1.0'
+  VERSION = '1.2.0'
   TAG_MERGE_SEPARATOR = '$$$' # separator for attributes to merge in "tags"
   TAG_ATTR_PREFIX = '__tags_' # prefix used for hidden tags filter attributes
 
