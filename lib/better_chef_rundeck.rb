@@ -4,7 +4,9 @@ require 'yaml'
 require 'chef'
 
 class BetterChefRundeck < Sinatra::Base
-  VERSION = '1.1.0'
+  VERSION = '1.2.0'
+  TAG_MERGE_SEPARATOR = '$$$' # separator for attributes to merge in "tags"
+  TAG_ATTR_PREFIX = '__tags_' # prefix used for hidden tags filter attributes
 
   class Error < StandardError
   end
@@ -90,6 +92,39 @@ class BetterChefRundeck < Sinatra::Base
     filter_result
   end
 
+  # If a "tags" key is specified and contains the merge separator,
+  # split_tags split the "tags" attributes, and either add the attribute to
+  # the params hash with the TAG_ATTR_PREFIX prefix so that it gets returned
+  # by the search, or gets the reference of a key pointing to the same attribute.
+  # The function returns both the updated hash and the reference keys
+  def split_tags params_hsh
+    tag_key_references = []
+    if params_hsh.key?('tags') && params_hsh['tags'].include?(TAG_MERGE_SEPARATOR)
+      params_hsh['tags'].split(TAG_MERGE_SEPARATOR).each do |attr|
+        attr_reference = params_hsh.key(attr)
+        if attr_reference.nil?
+          key = "#{TAG_ATTR_PREFIX}_#{attr}"
+          tag_key_references.push key
+          params_hsh[key] = attr
+        else
+          tag_key_references.push attr_reference
+        end
+      end
+      params_hsh.delete('tags')
+    end
+    return params_hsh, tag_key_references
+  end
+
+  # get_tags constructs the final tags attribute returned to rundeck based on
+  # the node result and the attribute references
+  def get_tags(node, tag_attr_references)
+    tag_attr_references.flat_map do |ref|
+      v = node[ref]
+      node.delete(ref) if ref.start_with? TAG_ATTR_PREFIX
+      v
+    end
+  end
+
   def filter_organization(query)
     return nil, query unless query =~ %r{\w+/.+:.+}
 
@@ -113,8 +148,11 @@ class BetterChefRundeck < Sinatra::Base
     # set defaults and overrides from GET params
     params_clone, defaults, overrides, appends = get_defaults_overrides params_clone
 
+    # manage the tags merging case
+    all_params, tag_attr_references = split_tags params_clone
+
     # build a filter result for a chef partial search from the remaining GET params
-    filter_result = get_filter_result params_clone
+    filter_result = get_filter_result all_params
 
     # format nodes for yaml: {<name>: {<attr>: <value>, <attr>: <value>}}
     formatted_nodes = {}
@@ -136,6 +174,8 @@ attribute to the attribute path `#{params['name']}` in your GET parameters \
       # merge in override attributes (overwrite all node attributes)
       node.merge!(overrides)
       node.merge!(appends) { |_key, node_val, append_val| "#{node_val}#{append_val}" unless node_val.nil? }
+
+      node['tags'] = get_tags(node, tag_attr_references) unless tag_attr_references.empty?
 
       formatted_nodes[node.delete('name')] = node
     end
