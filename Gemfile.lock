@@ -101,7 +101,7 @@ GEM
     powerpack (0.1.1)
     proxifier (1.0.3)
     public_suffix (3.0.1)
-    rack (2.0.3)
+    rack (2.0.8)
     rack-protection (2.0.0)
       rack
     rack-test (0.8.2)
