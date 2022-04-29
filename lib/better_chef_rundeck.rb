@@ -44,7 +44,7 @@ class BetterChefRundeck < Sinatra::Base
 
   # parse params hash for default_ and override_ keys
   def get_defaults_overrides params_hsh
-    defaults, overrides, appends = {}, {}, {}
+    defaults, overrides, appends, format, list_attr = {}, {}, {}, '', ''
     params_hsh.each do |k, v|
       if k.match(/^default_.+/)
         defaults[k.sub(/^default_/, '')] = v
@@ -55,9 +55,15 @@ class BetterChefRundeck < Sinatra::Base
       elsif k.match(/^append_.+/)
         appends[k.sub(/^append_/, '')] = v
         params_hsh.delete k
+      elsif k.match(/^format/)
+        format = !v.nil? ? v : 'yaml'
+        params_hsh.delete k
+      elsif k.match(/^list/)
+        list_attr = v
+        params_hsh.delete k
       end
     end
-    return params_hsh, defaults, overrides, appends
+    return params_hsh, defaults, overrides, appends, format = format.empty? ? 'yaml' : format, list_attr
   end
 
   # build a filter result for a chef partial search from the params hash
@@ -139,14 +145,22 @@ class BetterChefRundeck < Sinatra::Base
     return chef_server_url, search_query
   end
 
+  def return_format(input, format)
+    if format == 'yaml'
+      return input.to_yaml, format
+    elsif format == 'json'
+      return input.to_json, format
+    end
+    return "invalid format. requested format was \"#{format}\"", "yaml"
+  end
+
   get(/\/(.+:.+)/) do |query|
-    content_type 'text/yaml'
 
     # clean sinatra extras from params hash
     params_clone = clean_params params
 
-    # set defaults and overrides from GET params
-    params_clone, defaults, overrides, appends = get_defaults_overrides params_clone
+    # set defaults and overrides and format from GET params
+    params_clone, defaults, overrides, appends, format, list_attr = get_defaults_overrides params_clone
 
     # manage the tags merging case
     all_params, tag_attr_references = split_tags params_clone
@@ -180,7 +194,21 @@ attribute to the attribute path `#{params['name']}` in your GET parameters \
       formatted_nodes[node.delete('name')] = node
     end
 
+
     # send the nodes
-    formatted_nodes.to_yaml
+    if !list_attr.empty?
+      output = []
+      formatted_nodes.each do | k, v |
+        output << formatted_nodes[k][list_attr]
+      end
+      output = output.flatten.uniq
+    else
+      output = formatted_nodes
+    end
+
+    output, format = return_format(output, format)
+    
+    content_type "application/#{format}"
+    output
   end
 end

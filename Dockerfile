@@ -1,14 +1,14 @@
-FROM phusion/passenger-ruby21
+FROM phusion/passenger-ruby27
 
 USER app
-WORKDIR /home/app
-RUN git clone https://github.com/atheiman/better-chef-rundeck
+COPY . /home/app/better-chef-rundeck
 WORKDIR /home/app/better-chef-rundeck
-RUN bash -c 'sed -i"" -e "/passenger/s/~> 5.0/= $(passenger --version | grep -o '5.*')/" Gemfile' && \
-    cat Gemfile && bundle update passenger && \
+RUN cat Gemfile && \
     bundle install
 
 USER root
+RUN chown -R app:www-data /home/app/better-chef-rundeck && \
+    find /home/app/better-chef-rundeck -type f -exec chmod g+r {} \;
 RUN echo 'server {\n\
   listen 80;\n\
   root /home/app/better-chef-rundeck/public;\n\
